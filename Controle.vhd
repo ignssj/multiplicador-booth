@@ -40,7 +40,6 @@ BEGIN
 		CASE state IS
 			WHEN C0 =>
 				enableA_PC <= '1';
-				enableS_PC <= '1';
 				p0_PC <= '1';
 				p2_PC <= '1';
 				p4_PC <= '1';
