@@ -31,14 +31,19 @@ architecture rtl of Operativa is
 	process(clk_PO) is
 	begin
 	if (rising_edge(clk_PO)) then
+	if (rst_PO = '1') then
+	S_reg <= "000000000000";
+	P_PO <= S_reg;
+	end if;
 	--------------------------------------------------------------------------
 	if( Count_PO = "00" ) then
+	S_reg <= "000000000000";
 	A_reg (5 downto 0) <= X_PO;
 	p0 <= Y_PO (2 downto 0);
 	p2 <= Y_PO (4 downto 2);
 	p4 <= Y_PO (6 downto 4); 
-	end if;									  -- X= 000.100   (4) | X= 010101 (21
-	------------------------------------- Y= 000.110.0 (6) | Y= 011110.0 (30)
+	end if;									  -- X= 000.100   (4) | X= 010101 (21)
+	------------------------------------- Y= 000.110.0 (6) | Y= 000111.0 (30)
 	if (Count_PO = "01") then 
 		case p0 is
 			when "001" | "010" =>
@@ -86,11 +91,10 @@ architecture rtl of Operativa is
 				partial3_reg (9 downto 4)<= (-(A_reg(5 downto 0)));
 			when others => null;
 		end case;
+		P_PO <= partial_reg + partial2_reg + partial3_reg;
 	end if;
 	--------------------------------------------------------------------------
 	end if;
-	if(e_P = '1') then
-	P_PO <= partial_reg + partial2_reg + partial3_reg;
-	end if;
+	
 	end process;
 	end rtl;
