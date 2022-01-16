@@ -19,7 +19,7 @@ end entity;
 
 architecture rtl of Controle is
 
-	TYPE state_name IS (C1, C2, C3, C4);
+	TYPE state_name IS (C0, C1, C2, C3);
 
 	SIGNAL state, next_state : state_name;
 	SIGNAL count : unsigned (1 downto 0) := "00";
@@ -38,28 +38,28 @@ BEGIN
 	PROCESS (state)
 	BEGIN
 		CASE state IS
-			WHEN C1 =>
+			WHEN C0 =>
 				enableA_PC <= '1';
 				enableS_PC <= '1';
 				p0_PC <= '1';
 				p2_PC <= '1';
 				p4_PC <= '1';
 				count <= "00";
-				next_state <= C2;
+				next_state <= C1;
 
-			WHEN C2 =>
+			WHEN C1 =>
 				enableA_PC <= '0';
 				enableS_PC <= '0';
 				p0_PC <= '0';
 				p2_PC <= '0';
 				p4_PC <= '0';
 				count <= "01";
-				next_state <= C3;
+				next_state <= C2;
 
-			WHEN C3 =>
+			WHEN C2 =>
 				count <= "10";
-				next_state <= C4;
-			WHEN C4 =>
+				next_state <= C3;
+			WHEN C3 =>
 				enableS_PC <= '1';
 				count <= "11";
 		END CASE;
