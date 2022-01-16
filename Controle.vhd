@@ -29,7 +29,7 @@ BEGIN
 	PROCESS (clk_PC)
 	BEGIN
 		IF (rst_PC = '1') THEN
-			state <= C1;
+			state <= C0;
 		ELSIF (rising_edge(clk_PC)) THEN
 			state <= next_state;
 		END IF;
