@@ -46,7 +46,7 @@ BEGIN
 	 rst_TOP_sg <= '1' ;
 	 wait for 40 ns;
 	 X_TOP_sg  <= "010101";  -- (21)
-	 Y_TOP_sg  <= "0111100"; -- (30)
+	 Y_TOP_sg  <= "0001110"; -- (7)
 	 rst_TOP_sg  <= '0'  ;
 	wait;
  end process;
