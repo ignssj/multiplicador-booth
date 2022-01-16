@@ -8,9 +8,6 @@ entity Operativa is
 		clk_PO 	: in std_logic;
 		rst_PO 	: in std_logic;
 		e_A 		: in std_logic;
-		e_p0	 	: in std_logic;
-		e_p2	 	: in std_logic;
-		e_p4	 	: in std_logic;
 		e_P 		: in std_logic;
 		Count_PO : in unsigned (1 downto 0) := "00";
 		X_PO 		: in signed (5 downto 0);
@@ -28,73 +25,77 @@ architecture rtl of Operativa is
 	constant zero : std_logic_vector (11 downto 0) := "000000000000";
 	 	
 	begin 
-	process(clk_PO) is
+	process(clk_PO,rst_PO) is
 	begin
-	if (rising_edge(clk_PO)) then
-	if (rst_PO = '1') then
-	S_reg <= "000000000000";
-	P_PO <= S_reg;
-	end if;
-	--------------------------------------------------------------------------
-	if( Count_PO = "00" ) then
-	S_reg <= "000000000000";
-	A_reg (5 downto 0) <= X_PO;
-	p0 <= Y_PO (2 downto 0);
-	p2 <= Y_PO (4 downto 2);
-	p4 <= Y_PO (6 downto 4); 
-	end if;									  -- X= 000.100   (4) | X= 010101 (21)
-	------------------------------------- Y= 000.110.0 (6) | Y= 000111.0 (30)
-	if (Count_PO = "01") then 
-		case p0 is
-			when "001" | "010" =>
-				partial_reg(5 downto 0)<= A_reg(5 downto 0);
-			when "011" =>
-				partial_reg(6 downto 0)<= resize(A_reg, 7) sll 1; 
-			when "100" => -- p0 = 100
-				partial_reg(6 downto 0)<= resize((-A_reg),7) sll 1; -- partial_reg = 1111000
-				partial_reg(11 downto 7)<= "11111";
-			when "101" | "110" => 
-				partial_reg(5 downto 0)<= (-A_reg(5 downto 0)); 
-			when others => null;
-		end case;
-	end if;
-	--------------------------------------------------------------------------
-	if (Count_PO = "10") then
-		case p2 is 
-			when "000" | "111" =>
-				partial2_reg <= (to_signed(0,12));
-			when "001" | "010" => 
-				partial2_reg (7 downto 2)<= (A_reg(5 downto 0)); 
-			when "011" => -- p2 = 011
-				partial2_reg(8 downto 2)<= A_reg sll 1; -- partial2 = 0001000
-			when "100" =>
-				partial2_reg (8 downto 2)<= (-A_reg) sll 1;
-				partial2_reg(11 downto 9) <= "111";
-			when "101" | "110" =>
-				partial2_reg (7 downto 2)<= (-A_reg(5 downto 0));
-			when others => null;
-		end case;
-	end if;
-	--------------------------------------------------------------------------
-	if (Count_PO = "11") then
-		case p4 is 
-			when "000" | "111" =>
-				partial3_reg <= (to_signed(0,12)); -- partial 3 = 000000000000
-			when "001" | "010" =>
-				partial3_reg (9 downto 4)<= (A_reg(5 downto 0));
-			when "011" =>
-				partial3_reg (10 downto 4)<= A_reg sll 1;
-			when "100" =>
-				partial3_reg (10 downto 4)<= (-A_reg) sll 1;
-				partial3_reg(11) <= '1';
-			when "101" | "110" =>
-				partial3_reg (9 downto 4)<= (-(A_reg(5 downto 0)));
-			when others => null;
-		end case;
-		P_PO <= partial_reg + partial2_reg + partial3_reg;
-	end if;
-	--------------------------------------------------------------------------
-	end if;
-	
-	end process;
-	end rtl;
+		if (rising_edge(clk_PO)) then
+			if (rst_PO = '1') then
+				S_reg <= "000000000000";
+				P_PO <= S_reg;
+			end if;
+		--------------------------------------------------------------------------
+		if( Count_PO = "00" ) then
+			if (e_A = '1') then
+				S_reg <= "000000000000";
+				A_reg (5 downto 0) <= X_PO;
+				p0 <= Y_PO (2 downto 0);
+				p2 <= Y_PO (4 downto 2);
+				p4 <= Y_PO (6 downto 4); 
+			end if;
+		end if;									  -- X= 000.100   (4) | X= 010101 (21)
+		------------------------------------- Y= 000.110.0 (6) | Y= 000111.0 (30)
+		if (Count_PO = "01") then 
+			case p0 is
+				when "001" | "010" =>
+					partial_reg(5 downto 0)<= A_reg(5 downto 0);
+				when "011" =>
+					partial_reg(6 downto 0)<= resize(A_reg, 7) sll 1; 
+				when "100" => -- p0 = 100
+					partial_reg(6 downto 0)<= resize((-A_reg),7) sll 1; -- partial_reg = 1111000
+					partial_reg(11 downto 7)<= "11111";
+				when "101" | "110" => 
+					partial_reg(5 downto 0)<= (-A_reg(5 downto 0)); 
+				when others => null;
+			end case;
+		end if;
+		--------------------------------------------------------------------------
+		if (Count_PO = "10") then
+			case p2 is 
+				when "000" | "111" =>
+					partial2_reg <= (to_signed(0,12));
+				when "001" | "010" => 
+					partial2_reg (7 downto 2)<= (A_reg(5 downto 0)); 
+				when "011" => -- p2 = 011
+					partial2_reg(8 downto 2)<= A_reg sll 1; -- partial2 = 0001000
+				when "100" =>
+					partial2_reg (8 downto 2)<= (-A_reg) sll 1;
+					partial2_reg(11 downto 9) <= "111";
+				when "101" | "110" =>
+					partial2_reg (7 downto 2)<= (-A_reg(5 downto 0));
+				when others => null;
+			end case;
+		end if;
+		--------------------------------------------------------------------------
+		if (Count_PO = "11") then
+			case p4 is 
+				when "000" | "111" =>
+					partial3_reg <= (to_signed(0,12)); -- partial 3 = 000000000000
+				when "001" | "010" =>
+					partial3_reg (9 downto 4)<= (A_reg(5 downto 0));
+				when "011" =>
+					partial3_reg (10 downto 4)<= A_reg sll 1;
+				when "100" =>
+					partial3_reg (10 downto 4)<= (-A_reg) sll 1;
+					partial3_reg(11) <= '1';
+				when "101" | "110" =>
+					partial3_reg (9 downto 4)<= (-(A_reg(5 downto 0)));
+				when others => null;
+			end case;
+			if(e_P = '1') then
+				P_PO <= partial_reg + partial2_reg + partial3_reg;
+			end if;
+		end if;
+		--------------------------------------------------------------------------
+		end if;
+		
+		end process;
+		end rtl;
